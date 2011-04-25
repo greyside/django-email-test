@@ -1,0 +1,16 @@
+= Django Email Test =
+
+A simple app for sending test emails via Django's admin site.
+
+== Usage ==
+Put 'django-email-test' in INSTALLED_APPS, run syncdb, then send emails from the admin.
+
+= Contributing =
+You can fork this project on GitHub: http://github.com/SeanHayes/django-email-test.
+
+= License =
+This project is licensed under the BSD License.
+http://www.opensource.org/licenses/bsd-license.php
+
+== Links ==
+https://github.com/SeanHayes/django-email-test
