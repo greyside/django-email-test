@@ -11,4 +11,8 @@ from django.contrib import admin
 #App imports
 from models import TestEmail
 
-admin.site.register(TestEmail)
+class TestEmailAdmin(admin.ModelAdmin):
+	readonly_fields = ['sent', 'error']
+	save_as = True
+
+admin.site.register(TestEmail, TestEmailAdmin)

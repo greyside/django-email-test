@@ -5,12 +5,16 @@
 
 #Python imports
 from datetime import datetime
+import logging
+import traceback
 
 #Django imports
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db import models
 from django.db.models.signals import post_save
+
+logger = logging.getLogger(__name__)
 
 # Create your models here.
 
@@ -26,20 +30,45 @@ class TestEmail(models.Model):
 		'from',
 		default=lambda: settings.DEFAULT_FROM_EMAIL
 	)
-	to = models.TextField()
-	bcc = models.TextField()
+	to = models.TextField(
+		default='',
+		#null=True,
+		blank=True
+	)
+	bcc = models.TextField(
+		default='',
+		#null=True,
+		blank=True
+	)
 	subject = models.CharField(
 		max_length=150,
 		default="This is a test email."
 	)
 	body = models.TextField(default="Here's some default text.")
 	
+	sent = models.BooleanField(default=False, editable=False)
+	error = models.TextField(
+		default='',
+		blank=True,
+		editable=False
+	)
+	
 	def send(self):
 		to = self.to.split(',')
 		bcc = self.bcc.split(',')
 		
-		email = EmailMessage(self.subject, self.body, self.from_email, to, bcc)
-		email.send()
+		try:
+			email = EmailMessage(self.subject, self.body, self.from_email, to, bcc)
+			email.send()
+			self.sent = True
+		except Exception as e:
+			logger.error(e)
+			tb = traceback.format_exc()
+			self.error = unicode(tb)
+		
+		#only save here if already in the database, otherwise the save_handler will call this function again
+		if self.id:
+			self.save()
 	
 	def __unicode__(self):
 		return self.subject
