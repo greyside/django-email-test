@@ -19,6 +19,11 @@ logger = logging.getLogger(__name__)
 # Create your models here.
 
 class TestEmail(models.Model):
+	"""
+	A model representing an email. Once created, the data in this model is used
+	to send an email to the specified recipients, and any errors will be stored
+	on the model.
+	"""
 	added = models.DateTimeField(auto_now_add=True)
 	
 	#email fields
@@ -74,7 +79,7 @@ class TestEmail(models.Model):
 		return self.subject
 	
 	class Meta:
-		ordering = ['added']
+		ordering = ['-added']
 
 def test_email_save_handler(sender, instance, created, **kwargs):
 	if created:

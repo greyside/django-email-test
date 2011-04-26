@@ -12,7 +12,10 @@ from django.contrib import admin
 from models import TestEmail
 
 class TestEmailAdmin(admin.ModelAdmin):
-	readonly_fields = ['sent', 'error']
+	list_display = ['subject', 'added', 'date', 'sent', 'error']
+	list_filter = ['sent']
+	readonly_fields = ['added', 'sent', 'error']
 	save_as = True
+	search_fields = ['subject', 'from_email', 'to', 'bcc', 'body']
 
 admin.site.register(TestEmail, TestEmailAdmin)
