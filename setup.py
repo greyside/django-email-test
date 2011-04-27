@@ -6,7 +6,7 @@ import django_email_test
 
 setup(name='django-email-test',
 	version=django_email_test.__version__,
-	description="Generates configuration files for Apache, Nginx, etc. using values in settings.py and the Django template system. You can write your own templates for whatever text based config file you need.",
+	description="An app for sending test emails via the admin site to make sure your email server is working.",
 	author='Seán Hayes',
 	author_email='sean@seanhayes.name',
 	classifiers=[

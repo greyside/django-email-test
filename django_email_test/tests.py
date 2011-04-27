@@ -76,7 +76,7 @@ class TestEmailTestCase(TestCase):
 		self.assertEquals(te.error, '')
 		self.assertNotEquals(te.id, None)
 	
-	def test_send_error(self):
+	def test_test_email_save_handler_error(self):
 		#need EmailMessage.send() (which is called in TestEmail.send() to throw an error)
 		old_send = EmailMessage.send
 		error = Exception('an error occurred!')
