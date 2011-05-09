@@ -24,9 +24,11 @@ setup(name='django-email-test',
 		"Topic :: Software Development :: Libraries :: Python Modules"
 	],
 	keywords='django admin email test',
-	url='https://github.com/SeanHayes/django-email-test',
+	url='http://seanhayes.name/',
+	download_url='https://github.com/SeanHayes/django-email-test',
 	license='BSD',
 	packages=['django_email_test'],
+	include_package_data=True,
 	install_requires=['Django>=1.2',],
 )
 
