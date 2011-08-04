@@ -12,7 +12,7 @@ from django.core.mail import EmailMessage
 from django.test import TestCase
 
 #App imports
-from models import TestEmail
+from models import TestEmail, test_email_pre_save_handler
 
 class TestEmailTestCase(TestCase):
 	def setUp(self):
@@ -60,7 +60,7 @@ class TestEmailTestCase(TestCase):
 		#restore the original method so other tests can pass
 		EmailMessage.send = old_send
 	
-	def test_test_email_save_handler_success(self):
+	def test_test_email_post_save_handler_success(self):
 		self.assertEquals(len(mail.outbox), 0)
 		self.assertEquals(self.te.sent, False)
 		self.assertEquals(self.te.error, '')
@@ -76,7 +76,7 @@ class TestEmailTestCase(TestCase):
 		self.assertEquals(te.error, '')
 		self.assertNotEquals(te.id, None)
 	
-	def test_test_email_save_handler_error(self):
+	def test_test_email_post_save_handler_error(self):
 		#need EmailMessage.send() (which is called in TestEmail.send() to throw an error)
 		old_send = EmailMessage.send
 		error = Exception('an error occurred!')
@@ -101,4 +101,34 @@ class TestEmailTestCase(TestCase):
 		
 		#restore the original method so other tests can pass
 		EmailMessage.send = old_send
+	
+	def test_test_email_pre_save_handler_resets_error_and_sent_to_default_for_new_objects(self):
+		self.te.sent = True
+		self.te.error = 'Couldn\'t send email.'
+		
+		self.assertEquals(self.te.sent, True)
+		self.assertEquals(self.te.error, 'Couldn\'t send email.')
+		self.assertEquals(self.te.id, None)
+		
+		
+		test_email_pre_save_handler(TestEmail, self.te)
+		
+		self.assertEquals(self.te.sent, False)
+		self.assertEquals(self.te.error, '')
+		self.assertEquals(self.te.id, None)
+	
+	def test_test_email_pre_save_handler_leaves_saved_objects_alone(self):
+		self.te.id = 1
+		self.te.sent = True
+		self.te.error = 'Couldn\'t send email.'
+		
+		self.assertEquals(self.te.sent, True)
+		self.assertEquals(self.te.error, 'Couldn\'t send email.')
+		self.assertEquals(self.te.id, 1)
+		
+		test_email_pre_save_handler(TestEmail, self.te)
+		
+		self.assertEquals(self.te.sent, True)
+		self.assertEquals(self.te.error, 'Couldn\'t send email.')
+		self.assertEquals(self.te.id, 1)
 	

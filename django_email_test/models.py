@@ -12,7 +12,7 @@ import traceback
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +67,8 @@ class TestEmail(models.Model):
 			email.send()
 			self.sent = True
 		except Exception as e:
-			logger.error(e)
 			tb = traceback.format_exc()
+			logger.error(tb)
 			self.error = unicode(tb)
 		
 		#only save here if already in the database, otherwise the save_handler will call this function again
@@ -81,8 +81,18 @@ class TestEmail(models.Model):
 	class Meta:
 		ordering = ['-added']
 
-def test_email_save_handler(sender, instance, created, **kwargs):
+def test_email_pre_save_handler(sender, instance, **kwargs):
+	if instance.id is None:
+		#when saving a new object, have to reset these fields to default since
+		#they're copied by the admin when resending an email
+		instance.sent = instance._meta.get_field('sent').default
+		instance.error = instance._meta.get_field('error').default
+pre_save.connect(test_email_pre_save_handler, sender=TestEmail)
+
+def test_email_post_save_handler(sender, instance, created, **kwargs):
 	if created:
+		#TODO: reset error and sent
 		instance.send()
-post_save.connect(test_email_save_handler, sender=TestEmail)
+post_save.connect(test_email_post_save_handler, sender=TestEmail)
+
 
