@@ -66,7 +66,7 @@ class TestEmail(models.Model):
 			email = EmailMessage(self.subject, self.body, self.from_email, to, bcc)
 			email.send()
 			self.sent = True
-		except Exception as e:
+		except Exception, e:
 			tb = traceback.format_exc()
 			logger.error(tb)
 			self.error = unicode(tb)
